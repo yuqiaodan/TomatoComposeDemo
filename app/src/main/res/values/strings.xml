@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TomatoComposeDemo</string>
+    <string name="title_activity_list1">ListActivity1</string>
 </resources>
