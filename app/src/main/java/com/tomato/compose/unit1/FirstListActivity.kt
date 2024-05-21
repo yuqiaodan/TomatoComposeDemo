@@ -1,4 +1,4 @@
-package com.tomato.compose
+package com.tomato.compose.unit1
 
 import android.os.Bundle
 import android.util.Log
@@ -34,10 +34,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.tomato.compose.R
+import com.tomato.compose.SimpleData
 import com.tomato.compose.bean.Message
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
 
-class MainActivity : ComponentActivity() {
+/***
+ * 第一章 快速入门
+ * 第一个列表activity 例子
+ * */
+class FirstListActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,8 +66,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MessageCard(msg: Message) {
-
-
         Row(
             modifier = Modifier
                 .padding(8.dp)
