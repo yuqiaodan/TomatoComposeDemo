@@ -1,5 +1,6 @@
 package com.tomato.compose
 
+import android.util.Log
 import com.tomato.compose.bean.Message
 
 /**
@@ -7,6 +8,7 @@ import com.tomato.compose.bean.Message
  * Description：
  */
 object SimpleData {
+
     val listData = listOf(
         Message("1", "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"),
         Message("2", "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"),

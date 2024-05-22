@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.tomato.compose.R
 import com.tomato.compose.SimpleData
 import com.tomato.compose.bean.Message
+import com.tomato.compose.log
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
 
 /***
@@ -59,13 +60,13 @@ class FirstListActivity : ComponentActivity() {
     fun Conversation(messages: List<Message>) {
         LazyColumn {
             items(messages) {
-                MessageCard(msg = it)
+                MessageCard(msg = it,messages.indexOf(it))
             }
         }
     }
 
     @Composable
-    fun MessageCard(msg: Message) {
+    fun MessageCard(msg: Message,index:Int) {
         Row(
             modifier = Modifier
                 .padding(8.dp)
@@ -80,9 +81,13 @@ class FirstListActivity : ComponentActivity() {
                 alignment = Alignment.Center
             )
             Spacer(modifier = Modifier.width(5.dp))
-            var isExpanded by remember {
+
+            var isExpanded by remember (key1 =msg,key2 = index){
                 mutableStateOf(false)
             }
+
+            log("isExpanded:${isExpanded} key1:${msg.author} key2:${index}")
+
             val surfaceColor: Color by animateColorAsState(
                 if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
             )
