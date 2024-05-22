@@ -26,7 +26,7 @@ import com.tomato.compose.R
 /**
  * Created by Tomato on 2024/5/21.
  * Description：
- *
+ *标准布局组件 Row 横向布局  Colum纵向布局
  */
 @Composable
 fun PhotographerCard(modifier: Modifier = Modifier) {

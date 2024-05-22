@@ -1,13 +1,18 @@
 package com.tomato.compose.unit2
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 
 /**
@@ -19,10 +24,10 @@ import androidx.constraintlayout.compose.Dimension
  * parent是一个现有的引用 指ConstraintLayout本身
  */
 
-
+@Preview
 @Composable
 fun ConstrainLayoutContent1() {
-    ConstraintLayout {
+    ConstraintLayout(modifier = Modifier.background(Color.White)) {
         val (button, text) = createRefs()
         Button(onClick = { /*TODO*/ }, modifier = Modifier.constrainAs(button) {
             top.linkTo(parent.top, margin = 16.dp)
@@ -38,9 +43,10 @@ fun ConstrainLayoutContent1() {
     }
 }
 
+@Preview
 @Composable
 fun ConstrainLayoutContent2() {
-    ConstraintLayout {
+    ConstraintLayout(modifier = Modifier.background(Color.White)) {
         val (button1, button2, text1, text2) = createRefs()
         Button(onClick = { /*TODO*/ }, modifier = Modifier.constrainAs(button1) {
             top.linkTo(parent.top, margin = 16.dp)
@@ -80,11 +86,10 @@ fun ConstrainLayoutContent2() {
     }
 }
 
+@Preview
 @Composable
 fun ConstrainLayoutContent3() {
-
-
-    ConstraintLayout {
+    ConstraintLayout(modifier = Modifier.background(Color.White)) {
         val guideLine = createGuidelineFromStart(0.5f)
         val text = createRef()
         Text(
@@ -94,35 +99,47 @@ fun ConstrainLayoutContent3() {
                 width = Dimension.preferredWrapContent
                 height = Dimension.preferredWrapContent
             },
-            text = "这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是")
+            text = "这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是一个很长很长很长的字符串这是"
+        )
+    }
+}
+
+
+/**
+ * 解耦API
+ * 约束条件解耦 将约束条件和和布局内容分开
+ * */
+@Preview
+@Composable
+fun ConstrainLayoutContent4() {
+    BoxWithConstraints {
+        val constraintSet = if (maxWidth < maxHeight) {
+            //竖屏 返回16dp的布局 margin=16dp
+            decoupledConstraints(16.dp)
+        } else {
+            //横屏 返回160dp的布局 margin=16d0p
+            decoupledConstraints(160.dp)
+        }
+        ConstraintLayout(constraintSet = constraintSet, modifier = Modifier.background(Color.White)) {
+            Button(onClick = { }, modifier = Modifier.layoutId("button")) {
+                Text(text = "Button")
+            }
+            Text(text = "Text", modifier = Modifier.layoutId("text"))
+        }
     }
 
 
 }
 
-
-@Preview
-@Composable
-fun PreviewContent1() {
-    Surface {
-        ConstrainLayoutContent1()
-    }
-}
-
-
-@Preview
-@Composable
-fun PreviewContent2() {
-    Surface {
-        ConstrainLayoutContent2()
-    }
-}
-
-
-@Preview
-@Composable
-fun PreviewContent3() {
-    Surface {
-        ConstrainLayoutContent3()
+private fun decoupledConstraints(margin: Dp): ConstraintSet {
+    return ConstraintSet {
+        val button = createRefFor("button")
+        val text = createRefFor("text")
+        constrain(button) {
+            top.linkTo(parent.top, margin = margin)
+        }
+        constrain(text) {
+            top.linkTo(button.bottom, margin = margin)
+        }
     }
 }

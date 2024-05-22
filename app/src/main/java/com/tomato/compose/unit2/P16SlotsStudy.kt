@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Created by Tomato on 2024/5/21.
- * Description：
+ * Description：槽位布局 compose内置了许多自带槽位的布局 例如TopAppBar
  */
 
 @Composable

@@ -24,9 +24,13 @@ import kotlinx.coroutines.launch
  * Created by Tomato on 2024/5/21.
  * Description：
  */
+
+/**
+ *  //单独的Column是不能滚动的
+ * */
 @Composable
 fun SimpleColumn() {
-    //单独的Column是不能滚动的
+
     Column {
         repeat(100) {
             Text(text = "item${it}", style = MaterialTheme.typography.bodySmall)
@@ -34,6 +38,10 @@ fun SimpleColumn() {
     }
 }
 
+
+/**
+ * 添加scrollState后可以滑动 类似于ListView 或者ScrollView
+ * */
 @Composable
 fun SimpleList() {
     //添加scrollState后可以滑动 类似于ListView
@@ -45,6 +53,10 @@ fun SimpleList() {
     }
 }
 
+
+/**
+ * LazyColumn类似于RecycleView
+ * */
 @Composable
 fun SimpleLazyList() {
     //LazyColumn类似于RecycleView
@@ -57,6 +69,9 @@ fun SimpleLazyList() {
 }
 
 
+/**
+ * LazyColumn类似于RecycleView
+ * */
 @Composable
 fun ScrollingList() {
     val listSize = 70
