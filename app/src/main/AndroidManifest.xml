@@ -19,11 +19,7 @@
             android:exported="true"
             android:label="@string/title_activity_recover"
             android:theme="@style/Theme.TomatoComposeDemo" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".unit3state.ui.TodoActivity"
@@ -36,7 +32,13 @@
             android:name=".unit2.WidgetActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.TomatoComposeDemo"></activity>
+            android:theme="@style/Theme.TomatoComposeDemo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".unit1.FirstListActivity"
             android:exported="true"

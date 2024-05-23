@@ -35,7 +35,7 @@ class TodoViewModel : ViewModel() {
         private set
 
 
-    var currentEditPosition by mutableIntStateOf(-1)
+   private var currentEditPosition by mutableIntStateOf(-1)
 
     val currentEditItem: TodoItem?
         get() = todoItems.getOrNull(currentEditPosition)

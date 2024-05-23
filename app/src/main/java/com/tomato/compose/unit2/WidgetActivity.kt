@@ -3,6 +3,18 @@ package com.tomato.compose.unit2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxSize
+
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
 
 /***
@@ -15,7 +27,25 @@ class WidgetActivity : ComponentActivity() {
         setContent {
             TomatoComposeDemoTheme {
                 // A surface container using the 'background' color from the theme
-                ConstrainLayoutContent1()
+
+                MyBanner()
+
+            }
+        }
+    }
+
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun MyBanner() {
+// Display 10 items
+        val pagerState = rememberPagerState(initialPage = Int.MAX_VALUE/2)
+        Surface(modifier = Modifier.fillMaxSize()) {
+            HorizontalPager(state = pagerState, count = Int.MAX_VALUE) { page ->
+                // Our page content
+                Text(
+                    text = "Page: $page"
+                )
             }
         }
     }
