@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,9 +42,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.tomato.compose.log
 import com.tomato.compose.unit3state.bean.TodoIcon
 import com.tomato.compose.unit3state.bean.TodoItem
 
@@ -52,12 +53,160 @@ import com.tomato.compose.unit3state.bean.TodoItem
  * Description：
  */
 
+/**
+ * 输入框模块 背景
+ * content 允许传入任意组件
+ * @param elevate 是否显示阴影
+ * */
+@Composable
+fun InputBackground(modifier: Modifier = Modifier, elevate: Boolean, content: @Composable RowScope.() -> Unit) {
+    val animElevate by animateDpAsState(if (elevate) 1.dp else 0.dp, TweenSpec(300))
+    //添加阴影动画
+    Surface(
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+        shadowElevation = animElevate,
+        shape = RectangleShape
+    ) {
+        Row(
+            modifier = modifier.animateContentSize(animationSpec = TweenSpec(300)),
+            content = content
+        )
+    }
+}
+
+/**
+ * todo列表中点击后 弹出这个输入框 用于编辑TodoItem的内容
+ * @param item 编辑的原值
+ * @param onEditItemChange 编辑过程
+ * @param onEditDone 编辑完成
+ * @param onRemoveItem 删除item
+ * */
+@Composable
+fun TodoItemInlineEditor(
+    item: TodoItem,
+    onEditItemChange: (TodoItem) -> Unit,
+    onEditDone: () -> Unit,
+    onRemoveItem: () -> Unit
+) {
+    TodoItemInputStateProve(
+        text = item.task,
+        onTextChange = {
+            //使用copy保证uuid不改变
+            onEditItemChange(item.copy(task = it))
+        },
+        icon = item.icon,
+        onIconChange = {
+            onEditItemChange(item.copy(icon = it))
+        },
+        submit = onEditDone,
+        buttonSlot = {
+            //传入保存和删除两个图标
+            Row {
+                val shrinkButtons = Modifier.widthIn(min=20.dp)
+                TextButton(onClick = onEditDone, modifier = shrinkButtons) {
+                    //这里试试用emoji符号：软盘
+                    Text(
+                        text = "💾",
+                        textAlign = TextAlign.End
+                    )
+                }
+                TextButton(onClick = onRemoveItem, modifier = shrinkButtons) {
+                    //这里试试用emoji符号：软盘
+                    Text(
+                        text = "❌",
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
+        }
+    )
+}
 
 
+@Composable
+fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
+    val (text, setText) = remember {
+        mutableStateOf("")
+    }
+    var (icon, setIcon) = remember {
+        mutableStateOf(TodoIcon.Default)
+    }
+    //提交生成的TodoItem
+    val submit = {
+        onItemComplete.invoke(TodoItem(text, icon))
+        setText("")
+        icon = TodoIcon.Default
+    }
+
+    TodoItemInputStateProve(
+        text = text,
+        onTextChange = setText,
+        icon = icon,
+        onIconChange = setIcon,
+        submit = submit
+    ) {
+        //传入操作按钮
+        TodoEditButton(
+            onClick = submit,
+            text = "Add",
+            //按钮垂直居中
+            //modifier = Modifier.align(Alignment.CenterVertically),
+            //根据输入的内容是否为空 决定按钮是否可用
+            enable = text.isNotEmpty()
+        )
+    }
+}
 
 
+/**
+ * TodoItemInput 内部包含的很多状态了 做一个状态提升 将状态改为由外部传入
+ * 所有传入的状态变量必须包含以下两部分，才能让子组件根据状态变化改变UI和修改状态
+ * value: 状态原值
+ * setValue: (value)->Unit
+ * 不一定是直接传入这两个参数 比如传入一个state对象 其内部也包含了value和setValue
+ * */
+@Composable
+fun TodoItemInputStateProve(
+    text: String,
+    onTextChange: (String) -> Unit,
+    icon: TodoIcon,
+    onIconChange: (TodoIcon) -> Unit,
+    submit: () -> Unit,
+    buttonSlot: @Composable () -> Unit
+) {
+    Column(modifier = Modifier.background(Color.White)) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+
+        ) {
+            //输入框
+            TodoEditText(
+                text = text,
+                onTextChange = onTextChange,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = 8.dp)
+                    .padding(end = 8.dp),
+                //点击软键盘上的完成
+                onImeAction = submit
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(modifier = Modifier.align(Alignment.CenterVertically)) {
+                buttonSlot()
+            }
 
 
+        }
+        //根据输入的内容是否为空 决定图标选择列表是否显示
+        val iconRowVisible = text.isNotEmpty()
+        EditIconRow(
+            visible = iconRowVisible, icon = icon, onIconChange = onIconChange, modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+}
 
 
 /**
@@ -82,7 +231,6 @@ import com.tomato.compose.unit3state.bean.TodoItem
 @Preview
 @Composable
 fun TodoItemInput(onItemComplete: (todo: TodoItem) -> Unit = {}) {
-    log("TodoItemInput Rebuild")
     val (text, setText) = remember {
         mutableStateOf("")
     }
@@ -127,25 +275,6 @@ fun TodoItemInput(onItemComplete: (todo: TodoItem) -> Unit = {}) {
         EditIconRow(visible = iconRowVisible, icon = selectIcon, onIconChange = {
             selectIcon = it
         }, modifier = Modifier.padding(top = 8.dp))
-    }
-}
-
-
-
-/**
- * 输入框 背景
- * content 允许传入任意组件
- * @param elevate 是否显示阴影
- * */
-@Composable
-fun InputBackground(modifier: Modifier = Modifier, elevate: Boolean, content: @Composable RowScope.() -> Unit) {
-    val animElevate by animateDpAsState(if (elevate) 1.dp else 0.dp, TweenSpec(300, 0, FastOutLinearInEasing))
-    //添加阴影动画
-    Surface(
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
-        shadowElevation = animElevate, shape = RectangleShape
-    ) {
-        Row(modifier = modifier.animateContentSize(animationSpec = TweenSpec(300)), content = content)
     }
 }
 

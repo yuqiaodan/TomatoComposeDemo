@@ -8,14 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import com.tomato.compose.log
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
-import com.tomato.compose.unit3state.TodoItemInput
 import com.tomato.compose.unit3state.TodoScreenPage
-import com.tomato.compose.unit3state.bean.TodoItem
+
 
 class TodoActivity : ComponentActivity() {
 
@@ -27,9 +24,7 @@ class TodoActivity : ComponentActivity() {
             TomatoComposeDemoTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    TodoItemInput{item->
-                        log("${item.task}")
-                    }
+                    TodoActivityScreen()
                 }
             }
         }
@@ -39,13 +34,22 @@ class TodoActivity : ComponentActivity() {
     @Composable
     private fun TodoActivityScreen() {
         // 补充委托知识点 by 属性委托 P31
-        //items可以视为一个状态
-        val items: List<TodoItem> by viewModel.todoItems.observeAsState(listOf())
-        TodoScreenPage(data = items, onAddItem = {
-            viewModel.addItem(it)
-        }, onRemoveItem = {
-            viewModel.removeItem(it)
-        })
+        //items可以视为一个状态 LiveData可以直接通过observeAsState转为一个state对象
+        //val items: List<TodoItem> by viewModel.todoItems.observeAsState(listOf())
+        TodoScreenPage(
+            data = viewModel.todoItems,
+            currentEditing = viewModel.currentEditItem,
+            //可以按传统方式调用viewmodel中的函数 也可以传入函数的引用
+            //添加事件
+            onAddItem = {
+                viewModel.addItem(it)
+            },
+            //传入函数的引用
+            onRemoveItem = viewModel::removeItem,//删除
+            onStartEdit = viewModel::onEditItemSelected,//开始编辑
+            onEditItemChange = viewModel::onEditItemChange,//编辑中
+            onEditDone = viewModel::onEditDone//保存
+        )
     }
 }
 

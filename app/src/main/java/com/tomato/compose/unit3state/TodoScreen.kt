@@ -12,10 +12,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tomato.compose.unit3state.bean.TodoItem
 import kotlin.random.Random
@@ -28,17 +31,60 @@ import kotlin.random.Random
  * p38-p41 暂时跳过
  */
 
+/**
+ * 列表Page
+ * */
 @Composable
 fun TodoScreenPage(
     data: List<TodoItem>,
+    currentEditing: TodoItem?,
     onAddItem: (item: TodoItem) -> Unit,
-    onRemoveItem: (item: TodoItem) -> Unit
+    onRemoveItem: (item: TodoItem) -> Unit,
+    onStartEdit: (TodoItem) -> Unit,
+    onEditItemChange: (TodoItem) -> Unit,
+    onEditDone: () -> Unit,
 ) {
     Column {
+        //当currentEditing 当前编辑条目为空 则顶部显示「添加」输入框，若进入编辑状态 则显示文本"Edition item"
+        val enableTopSection = (currentEditing == null)
+
+        //输入框 外加一个背景InputBackground
+        InputBackground(elevate = true) {
+            if (enableTopSection) {
+                TodoItemEntryInput {
+                    onAddItem(it)
+                }
+            } else {
+                Text(
+                    text = "Edition item",
+                    //字体
+                    style = MaterialTheme.typography.bodyMedium,
+                    //文本水平居中
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        //整个控件相对父布局垂直居中
+                        .align(Alignment.CenterVertically)
+                        .padding(16.dp)
+                        //填充父容器
+                        .fillMaxWidth()
+                )
+            }
+
+        }
+        //多行
         LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(8.dp)) {
-            items(data) { item ->
-                //单个条目宽度填充父布局最大宽度
-                TodoRow(todo = item, Modifier.fillParentMaxWidth(), onItemClick = { onRemoveItem(it) })
+            items(data) { todo ->
+                if (todo.id == currentEditing?.id) {
+                    TodoItemInlineEditor(item = todo,
+                        onEditItemChange = onEditItemChange,
+                        onEditDone = onEditDone,
+                        onRemoveItem = { onRemoveItem(todo) })
+                } else {
+                    //单个条目宽度填充父布局最大宽度
+                    TodoRow(todo = todo, Modifier.fillParentMaxWidth(),
+                        onItemClick = { onStartEdit(todo) })
+
+                }
             }
         }
         Button(
@@ -88,13 +134,6 @@ fun TodoRow(todo: TodoItem, modifier: Modifier = Modifier, onItemClick: (item: T
 
 private fun randomTint(): Float {
     return Random.nextFloat().coerceIn(0.3f, 0.9f)
-}
-
-@Composable
-fun TodoItemEntityInput(){
-
-
-
 }
 
 
