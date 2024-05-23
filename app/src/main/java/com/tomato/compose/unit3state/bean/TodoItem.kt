@@ -1,4 +1,4 @@
-package com.tomato.compose.unit3state
+package com.tomato.compose.unit3state.bean
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CropSquare

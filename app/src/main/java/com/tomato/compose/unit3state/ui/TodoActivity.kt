@@ -1,7 +1,6 @@
-package com.tomato.compose.unit3state
+package com.tomato.compose.unit3state.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -14,6 +13,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import com.tomato.compose.log
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
+import com.tomato.compose.unit3state.TodoItemInput
+import com.tomato.compose.unit3state.TodoScreenPage
+import com.tomato.compose.unit3state.bean.TodoItem
 
 class TodoActivity : ComponentActivity() {
 
