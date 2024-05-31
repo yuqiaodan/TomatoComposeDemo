@@ -1,4 +1,4 @@
-package com.tomato.compose.unit2
+package com.tomato.compose.dongnaoxueyuan.unit2
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

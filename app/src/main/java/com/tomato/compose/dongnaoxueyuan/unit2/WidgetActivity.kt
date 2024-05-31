@@ -1,4 +1,4 @@
-package com.tomato.compose.unit2
+package com.tomato.compose.dongnaoxueyuan.unit2
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

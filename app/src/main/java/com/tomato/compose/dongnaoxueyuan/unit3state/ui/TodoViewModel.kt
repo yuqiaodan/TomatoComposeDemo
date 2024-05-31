@@ -1,4 +1,4 @@
-package com.tomato.compose.unit3state.ui
+package com.tomato.compose.dongnaoxueyuan.unit3state.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.tomato.compose.unit3state.bean.TodoItem
+import com.tomato.compose.dongnaoxueyuan.unit3state.bean.TodoItem
 
 /**
  * Created by Tomato on 2024/5/22.
@@ -52,7 +52,7 @@ class TodoViewModel : ViewModel() {
     }
 
     //当todo列表内item被选中时 传入该对象 获取它在列表中的索引位置
-    fun onEditItemSelected(item:TodoItem){
+    fun onEditItemSelected(item: TodoItem){
         currentEditPosition = todoItems.indexOf(item)
     }
 

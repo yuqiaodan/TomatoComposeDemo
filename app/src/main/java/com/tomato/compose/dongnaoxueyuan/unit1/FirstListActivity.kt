@@ -1,4 +1,4 @@
-package com.tomato.compose.unit1
+package com.tomato.compose.dongnaoxueyuan.unit1
 
 import android.os.Bundle
 import android.util.Log
@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tomato.compose.R
-import com.tomato.compose.SimpleData
+import com.tomato.compose.Constants
 import com.tomato.compose.bean.Message
 import com.tomato.compose.log
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
@@ -52,7 +52,7 @@ class FirstListActivity : ComponentActivity() {
         setContent {
             TomatoComposeDemoTheme {
                 // A surface container using the 'background' color from the theme
-                Conversation(messages = SimpleData.listData)
+                Conversation(messages = Constants.listData)
             }
         }
     }
@@ -129,7 +129,7 @@ class FirstListActivity : ComponentActivity() {
     @Preview(showBackground = true, showSystemUi = true, device = Devices.NEXUS_5)
     @Composable
     fun PreviewMessageCard() {
-        Conversation(messages = SimpleData.listData)
+        Conversation(messages = Constants.listData)
     }
 
 

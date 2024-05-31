@@ -6,4 +6,9 @@
     <string name="title_activity_todo">TodoActivity</string>
     <string name="title_activity_recover">RecoverActivity</string>
     <string name="title_activity_wei">WeiActivity</string>
+
+
+    <string name="text_sample_1">Start\nJetpack Compose</string>
+
+
 </resources>

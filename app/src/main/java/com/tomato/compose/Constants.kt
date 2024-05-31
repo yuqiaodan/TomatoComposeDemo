@@ -1,13 +1,12 @@
 package com.tomato.compose
 
-import android.util.Log
 import com.tomato.compose.bean.Message
 
 /**
  * Created by Tomato on 2024/5/21.
  * Description：
  */
-object SimpleData {
+object Constants {
 
     val listData = listOf(
         Message("1", "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"),

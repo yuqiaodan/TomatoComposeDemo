@@ -1,4 +1,4 @@
-package com.tomato.compose.unit2
+package com.tomato.compose.dongnaoxueyuan.unit2
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,7 +42,7 @@ fun PhotographerCard(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.ic_header_1),
+                painter = painterResource(id = R.mipmap.iv_cover_happy),
                 contentDescription = null
             )
         }
