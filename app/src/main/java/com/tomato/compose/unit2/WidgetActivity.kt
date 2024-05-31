@@ -48,5 +48,7 @@ class WidgetActivity : ComponentActivity() {
                 )
             }
         }
+
+        //pagerState.scr(1)
     }
 }

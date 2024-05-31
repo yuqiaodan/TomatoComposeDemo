@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.MutableLiveData
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
 import com.tomato.compose.unit3state.TodoScreenPage
+import com.tomato.compose.unit3state.bean.TodoItem
 
 
 class TodoActivity : ComponentActivity() {
@@ -30,9 +33,10 @@ class TodoActivity : ComponentActivity() {
         }
     }
 
-
+   //val sss = MutableLiveData<List<TodoItem>>(listOf())
     @Composable
     private fun TodoActivityScreen() {
+        //sss.observeAsState()
         // 补充委托知识点 by 属性委托 P31
         //items可以视为一个状态 LiveData可以直接通过observeAsState转为一个state对象
         //val items: List<TodoItem> by viewModel.todoItems.observeAsState(listOf())
