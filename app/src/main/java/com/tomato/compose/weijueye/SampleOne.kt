@@ -3,6 +3,21 @@ package com.tomato.compose.weijueye
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -88,7 +103,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.tomato.compose.R
 import com.tomato.compose.bean.UserBean
 import com.tomato.compose.log
@@ -100,7 +114,7 @@ import com.tomato.compose.toast
  * 视频教程：https://www.bilibili.com/video/BV1Eb4y147zR
  * 博客地址：https://docs.bughub.icu/compose/
  */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Preview(showSystemUi = true)
 @Composable
 fun SampleOne(context: Context? = null) {
@@ -109,21 +123,150 @@ fun SampleOne(context: Context? = null) {
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
+        UnitCard(title = "animate*AsState 更基础的动画， AnimatedVisibility AnimatedContent都是基于此实现") {
+            var size by remember { mutableStateOf(60.dp) }
+            //animationSpec 理解为插值器 可以设置动画运行方式 回弹，先快后慢什么什么的
+            val sizeAnim by animateDpAsState(targetValue = size, animationSpec = spring(Spring.DampingRatioHighBouncy))
+            var color by remember { mutableStateOf(Color.Gray) }
+            val colorAnim by animateColorAsState(targetValue = color)
+            Icon(modifier = Modifier
+                    .size(sizeAnim)
+                    .clickable {
+                        if (size == 120.dp) {
+                            size = 60.dp
+                            color = Color.Gray
+                        } else {
+                            size = 120.dp
+                            color = Color.Red
+                        }
+                    },
+                tint = colorAnim, imageVector = Icons.Default.Favorite, contentDescription = null
+            )
 
+            Text(text = "换一种写法 通过isFavorite状态统一管理size和color")
+            var isFavorite  by remember {
+                mutableStateOf(false)
+            }
+            val favoriteSizeAnim by animateDpAsState(targetValue =  if (isFavorite) { 90.dp } else { 45.dp }, animationSpec = spring(Spring.DampingRatioHighBouncy))
+            val favoriteColorAnim by animateColorAsState(targetValue = if (isFavorite) { Color.Red } else { Color.Gray })
+            Icon(
+                modifier = Modifier
+                    .size(favoriteSizeAnim)
+                    .clickable {
+                        isFavorite=!isFavorite
+                    },
+                tint = favoriteColorAnim, imageVector = Icons.Default.Favorite, contentDescription = null
+            )
+
+        }
+
+        UnitCard(title = "Modifier.animateContentSize() 组件宽高改变后自带动画") {
+            var msg by remember {
+                mutableStateOf("Hello World!")
+            }
+            Button(onClick = {
+                msg = if (msg.length > 20) {
+                    "Hello World!"
+                } else {
+                    "Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!"
+
+                }
+            }) {
+                Text(text = "Size改变动画")
+            }
+            Text(text = msg, modifier = Modifier.animateContentSize())
+        }
+
+        UnitCard(title = "AnimatedContent") {
+            var count by remember {
+                mutableStateOf(0)
+            }
+            Row {
+                Button(onClick = { count-- }) {
+                    Text(text = "减少")
+                }
+                Button(onClick = { count++ }) {
+                    Text(text = "增加")
+                }
+            }
+            //定义AnimatedContent内部状态改变的动画
+            AnimatedContent(targetState = count,
+                //自定义状态改变的状态
+                transitionSpec = {
+                    if (initialState > targetState) {
+                        //初始值>目标值 表示减少
+                        (slideInVertically { fullHeight -> fullHeight } + fadeIn())
+                            .togetherWith(
+                                slideOutVertically { fullHeight -> fullHeight } + fadeOut()
+                            )
+                    } else {
+                        //初始值>目标值 表示增加
+                        (slideInVertically { fullHeight -> -fullHeight } + fadeIn())
+                            .togetherWith(
+                                slideOutVertically { fullHeight -> -fullHeight } + fadeOut()
+                            )
+                    }
+                }
+            ) { targetCount ->
+                Text(text = "今日步数${targetCount}")
+            }
+        }
+
+        UnitCard(title = "AnimatedVisibility显示消失动画") {
+            var imageVisible by remember {
+                mutableStateOf(true)
+            }
+            Button(onClick = { imageVisible = !imageVisible }) {
+                Text(text = "点击播放动画")
+            }
+            /***
+             * AnimatedVisibility显示消失动画 可以通过enter和exit 分别设置显示和消失动画
+             * 官方提供了一些内置动画 scaleIn scaleOut ，也可以自定义动画 自己拓展
+             * ***/
+            AnimatedVisibility(visible = imageVisible, enter = scaleIn(), exit = scaleOut()) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    painter = painterResource(id = R.mipmap.iv_cover_happy), contentDescription = null
+                )
+            }
+
+            /***
+             * 在AnimatedVisibility作用域中
+             * 也可以通过Modifier.animateEnterExit单独为某一个组件显示消失动画
+             * 仅在AnimatedVisibility没有设置enter , exit 时生效
+             * ***/
+            AnimatedVisibility(visible = imageVisible) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .animateEnterExit(enter = slideInVertically(), exit = slideOutVertically()),
+                    painter = painterResource(id = R.mipmap.iv_cover_happy), contentDescription = null
+                )
+            }
+
+
+        }
         UnitCard(title = "Dialog用法") {
-
             /*val isShowLoading=false
-            
             Dialog(onDismissRequest = { *//*TODO*//* }) {
-                
+
             }*/
 
         }
+
+
+
+
         UnitCard(title = "LazyVerticalGrid表格列表的使用") {
-            val list = listOf("aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
-                "cccccccccccccc","aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
-                "cccccccccccccc","aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
-                "cccccccccccccc")
+            val list = listOf(
+                "aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
+                "cccccccccccccc", "aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
+                "cccccccccccccc", "aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
+                "cccccccccccccc"
+            )
             //普通整齐表格
             //columns = 列数
             //GridCells.Fixed(3) 固定列数 3
