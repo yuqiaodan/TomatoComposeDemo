@@ -1,19 +1,30 @@
 package com.tomato.compose.weijueye
 
 import android.animation.ObjectAnimator
+import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -24,18 +35,22 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.SafetyCheck
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -46,6 +61,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -72,7 +88,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.tomato.compose.R
+import com.tomato.compose.bean.UserBean
 import com.tomato.compose.log
 import com.tomato.compose.toast
 
@@ -82,36 +100,223 @@ import com.tomato.compose.toast
  * 视频教程：https://www.bilibili.com/video/BV1Eb4y147zR
  * 博客地址：https://docs.bughub.icu/compose/
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(showSystemUi = true)
 @Composable
-fun SampleOne() {
+fun SampleOne(context: Context? = null) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
-        UnitCard(title = "Box基本用法") {
-            Box (modifier=Modifier.background(Color.Green.copy(alpha = 0.1f))){
 
-                Box(modifier = Modifier
+        UnitCard(title = "Dialog用法") {
+
+            /*val isShowLoading=false
+            
+            Dialog(onDismissRequest = { *//*TODO*//* }) {
+                
+            }*/
+
+        }
+        UnitCard(title = "LazyVerticalGrid表格列表的使用") {
+            val list = listOf("aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
+                "cccccccccccccc","aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
+                "cccccccccccccc","aaaaaaaa", "bbbb", "aaa", "ccccccccccc", "sssssssssssss", "aasda", "aa", "b",
+                "cccccccccccccc")
+            //普通整齐表格
+            //columns = 列数
+            //GridCells.Fixed(3) 固定列数 3
+            //GridCells.Adaptive(50.dp) 不指定列数 设置单元格最小宽度为50dp(根据屏幕宽度尽可能多的排列单元格进区)
+            //GridCells.FixedSize (50.dp) 不指定列数 设置单元格固定宽度为50dp
+            val state = rememberLazyGridState()
+            LazyVerticalGrid(state = state, columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp)) {
+                items(list) {
+                    Text(text = it, modifier = Modifier.height(60.dp))
+                }
+            }
+            //非固定表格 瀑布流表格 自己多研究一下
+            /* LazyVerticalStaggeredGrid(columns = ) {
+            }
+             LazyHorizontalStaggeredGrid(rows = ) {
+
+             }*/
+        }
+
+
+        UnitCard(title = "LazyRow列表的使用") {
+            val list = listOf(1, 3, 4, 5, 6, 7, 8, 9, 10)
+            LazyRow {
+                stickyHeader {
+                    Text(
+                        text = "我是表头", modifier = Modifier
+                            .size(100.dp)
+                            .background(Color.Yellow)
+                    )
+                }
+                items(list) {
+                    Text(text = "index：${it}")
+                }
+            }
+        }
+
+        UnitCard(title = "LazyColumn列表的使用") {
+            Button(onClick = { context?.let { it.startActivity(Intent(it, SampleListActivity::class.java)) } }) {
+                Text(text = "跳转->列表的使用")
+            }
+        }
+
+        UnitCard(title = "ListItem列表组件使用") {
+            val userList = remember {
+                mutableStateListOf<UserBean>(
+                    UserBean("Name", "+86 12345678", false),
+                    UserBean("Name", "+86 12345678", false),
+                    UserBean("Name", "+86 12345678", false)
+                )
+            }
+            Column {
+                userList.forEachIndexed { index, userBean ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Default.ManageAccounts, contentDescription = null)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = userBean.name)
+                            Text(text = userBean.number)
+                        }
+                        Checkbox(checked = userBean.isCheck, onCheckedChange = {
+                            userList[index] = userList[index].copy(isCheck = it)
+                        })
+                    }
+                }
+            }
+            Text(text = "ListItem就是一个模板组件 一个常见的列表item样式 填充不同的列表内容 不建议使用 最好自己写")
+            Image(painter = painterResource(id = R.mipmap.eg_listitem), contentDescription = null)
+        }
+
+        UnitCard(title = "CheckBox单选框") {
+            var isCheck by remember {
+                mutableStateOf(false)
+            }
+            Checkbox(checked = isCheck, onCheckedChange = { isCheck = it })
+        }
+
+        UnitCard(title = "RadioButton单选按钮基本用法") {
+            Text(text = "单选：")
+            var isSelect by remember {
+                mutableStateOf(false)
+            }
+            RadioButton(selected = isSelect, onClick = { isSelect = !isSelect })
+
+            Text(text = "多选：")
+            val checkedList = remember {
+                mutableStateListOf<Boolean>(false, false)
+            }
+            Column {
+                checkedList.forEachIndexed { index, b ->
+                    RadioButton(selected = b, onClick = {
+                        checkedList[index] = !checkedList[index]
+                    })
+                }
+            }
+
+        }
+
+        UnitCard(title = "Divider分割线基本用法") {
+            Column(
+                modifier = Modifier
                     .size(200.dp)
-                    .background(Color.Red.copy(alpha = 0.5f)))
+                    .background(Color.Green.copy(alpha = 0.1f)),
+                //纵向排列方式
+                verticalArrangement = Arrangement.Top,
+                //横向对齐方式
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(text = "第一行 item", modifier = Modifier.background(Color.Red.copy(alpha = 0.1f)))
+                //分割线可以设置「Color ：颜色」和 「thickness：厚度」->Column中是高度 Row是宽度
+                Divider(color = Color.Yellow, thickness = 3.dp)
+                Text(text = "第二行 item", modifier = Modifier.background(Color.Blue.copy(alpha = 0.1f)))
+            }
+        }
+
+        UnitCard(title = "Spacer基本用法 当成一个空View来用，可以当成margin来使用") {
+            Column(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color.Green.copy(alpha = 0.1f)),
+                //纵向排列方式
+                verticalArrangement = Arrangement.Top,
+                //横向对齐方式
+                horizontalAlignment = Alignment.Start
+            ) {
+                //ColumnScope中可以使用Modifier.weight设置比重
+                Text(text = "第一行 item", modifier = Modifier.background(Color.Red.copy(alpha = 0.1f)))
+                //Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = "第二行 item", modifier = Modifier.background(Color.Blue.copy(alpha = 0.1f)))
+            }
+        }
+
+        UnitCard(title = "Row基本用法 用法和Colum差不多") {
+            Row(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color.Green.copy(alpha = 0.1f)),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(text = "第一列 item")
+                Text(text = "第二列 item")
+            }
+            Text(text = "横向排列方式horizontalArrangement :Arrangement七个枚举值的效果：")
+            Image(painter = painterResource(id = R.mipmap.eg_hor_arrangement_type), contentDescription = null)
+        }
+
+        UnitCard(title = "Colum基本用法 纵向布局") {
+            Column(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color.Green.copy(alpha = 0.1f)),
+                //纵向排列方式
+                verticalArrangement = Arrangement.Bottom,
+                //横向对齐方式
+                horizontalAlignment = Alignment.Start
+            ) {
+                //ColumnScope中可以使用Modifier.weight设置比重
+                Text(
+                    text = "第一行 item 权重weight=1f", modifier = Modifier
+                        .weight(1f)
+                        .background(Color.Red.copy(alpha = 0.1f))
+                )
+                Text(text = "第二行 item")
+            }
+            Text(text = "纵向排列方式verticalArrangement :Arrangement七个枚举值的效果：")
+            Image(painter = painterResource(id = R.mipmap.eg_ver_arrangement_type), contentDescription = null)
+        }
+        UnitCard(title = "Box基本用法") {
+            Box(modifier = Modifier.background(Color.Green.copy(alpha = 0.1f))) {
+
+                Box(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .background(Color.Red.copy(alpha = 0.5f))
+                )
                 //可以通过align设置Box子组件对齐位置 align 可以设置9个位置 竖直：上中下 水平：左中右 两两组合
-                Box(modifier = Modifier
-                    .size(100.dp)
-                    .background(Color.Yellow.copy(alpha = 0.5f))
-                    .align(Alignment.Center))
-                Text(text = "Text 1",modifier = Modifier.align(Alignment.TopEnd))
-                Text(text = "Text 2",modifier = Modifier.align(Alignment.CenterStart))
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Yellow.copy(alpha = 0.5f))
+                        .align(Alignment.Center)
+                )
+                Text(text = "Text 1", modifier = Modifier.align(Alignment.TopEnd))
+                Text(text = "Text 2", modifier = Modifier.align(Alignment.CenterStart))
             }
 
             //带约束的Box->BoxWithConstraints
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 //其作用域中多了几个属性
-                log("maxWidth:$maxWidth  maxHeight:$maxHeight " )
-                if(maxWidth>maxHeight){
+                log("maxWidth:$maxWidth  maxHeight:$maxHeight ")
+                if (maxWidth > maxHeight) {
                     Text(text = "当前横屏")
-                }else{
+                } else {
                     Text(text = "当前竖屏")
                 }
             }
@@ -443,9 +648,7 @@ fun SampleOne() {
         }
     }
 
-
 }
-
 
 
 /**
@@ -475,8 +678,6 @@ private fun StateSample(parentCount: Int, setParent: (Int) -> Unit) {
         Text(text = "点击次数记录：子组件${count} 全局记录：${globalCount} 父组件记录：${parentCount}")
     }
 }
-
-
 
 
 @Composable
