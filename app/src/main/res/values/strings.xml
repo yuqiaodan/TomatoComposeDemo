@@ -10,6 +10,7 @@
 
     <string name="text_sample_1">Start\nJetpack Compose</string>
     <string name="title_activity_sample_list">SampleListActivity</string>
+    <string name="title_activity_sample_navigation">SampleNavigationActivity</string>
 
 
 </resources>

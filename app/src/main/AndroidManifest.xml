@@ -16,14 +16,16 @@
         android:theme="@style/Theme.TomatoComposeDemo"
         tools:targetApi="31">
         <activity
+            android:name=".weijueye.SampleNavigationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TomatoComposeDemo" />
+        <activity
             android:name=".weijueye.SampleListActivity"
             android:exported="false"
-            android:label="@string/title_activity_sample_list"
             android:theme="@style/Theme.TomatoComposeDemo" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.TomatoComposeDemo">
             <intent-filter>
@@ -35,22 +37,18 @@
         <activity
             android:name=".dongnaoxueyuan.unit3state.ui.RecoverActivity"
             android:exported="true"
-            android:label="@string/title_activity_recover"
             android:theme="@style/Theme.TomatoComposeDemo" />
         <activity
             android:name=".dongnaoxueyuan.unit3state.ui.TodoActivity"
             android:exported="true"
-            android:label="@string/title_activity_todo"
             android:theme="@style/Theme.TomatoComposeDemo" />
         <activity
             android:name=".dongnaoxueyuan.unit2.WidgetActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
-            android:theme="@style/Theme.TomatoComposeDemo"></activity>
+            android:theme="@style/Theme.TomatoComposeDemo" />
         <activity
             android:name=".dongnaoxueyuan.unit1.FirstListActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.TomatoComposeDemo" />
     </application>
 

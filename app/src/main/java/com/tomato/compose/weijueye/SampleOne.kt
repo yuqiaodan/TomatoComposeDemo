@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,6 +64,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -82,6 +84,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -123,23 +126,43 @@ fun SampleOne(context: Context? = null) {
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
+
+        UnitCard(title = "Navigation导航的用法") {
+            Button(onClick = { context?.let { it.startActivity(Intent(it, SampleNavigationActivity::class.java)) } }) {
+                Text(text = "跳转->Navigation的使用")
+            }
+        }
+
         UnitCard(title = "animate*AsState 更基础的动画， AnimatedVisibility AnimatedContent都是基于此实现") {
+            /***
+             * animationSpec 理解为超级插值器 可以设置动画运行方式 回弹，先快后慢什么什么的
+             * 除了spring（物理仿真动画）还有其他效果可选：
+             * tween: 适用于大多数简单、基于时间的动画需求。
+             * spring: 适用于需要物理仿真效果的动画。
+             * keyframes: 适用于需要精确控制动画各个时间点具体值的动画。
+             * repeatable: 适用于需要重复一定次数的动画。
+             * infiniteRepeatable: 适用于需要无限次重复的动画。
+             *
+             *
+             * animateFloatAsState 已经处理了内部状态管理和状态记忆，因此无需显式使用 remember。
+             * 在日常使用中，这使得代码更加简洁和直观。
+             * 在管理其他类型的状态时，remember 仍然是一个重要的工具，用于确保状态在重组过程中的一致性。
+             * */
             var size by remember { mutableStateOf(60.dp) }
-            //animationSpec 理解为插值器 可以设置动画运行方式 回弹，先快后慢什么什么的
             val sizeAnim by animateDpAsState(targetValue = size, animationSpec = spring(Spring.DampingRatioHighBouncy))
             var color by remember { mutableStateOf(Color.Gray) }
             val colorAnim by animateColorAsState(targetValue = color)
             Icon(modifier = Modifier
-                    .size(sizeAnim)
-                    .clickable {
-                        if (size == 120.dp) {
-                            size = 60.dp
-                            color = Color.Gray
-                        } else {
-                            size = 120.dp
-                            color = Color.Red
-                        }
-                    },
+                .size(sizeAnim)
+                .clickable {
+                    if (size == 120.dp) {
+                        size = 60.dp
+                        color = Color.Gray
+                    } else {
+                        size = 120.dp
+                        color = Color.Red
+                    }
+                },
                 tint = colorAnim, imageVector = Icons.Default.Favorite, contentDescription = null
             )
 
@@ -153,7 +176,7 @@ fun SampleOne(context: Context? = null) {
                 modifier = Modifier
                     .size(favoriteSizeAnim)
                     .clickable {
-                        isFavorite=!isFavorite
+                        isFavorite = !isFavorite
                     },
                 tint = favoriteColorAnim, imageVector = Icons.Default.Favorite, contentDescription = null
             )
@@ -273,7 +296,13 @@ fun SampleOne(context: Context? = null) {
             //GridCells.Adaptive(50.dp) 不指定列数 设置单元格最小宽度为50dp(根据屏幕宽度尽可能多的排列单元格进区)
             //GridCells.FixedSize (50.dp) 不指定列数 设置单元格固定宽度为50dp
             val state = rememberLazyGridState()
-            LazyVerticalGrid(state = state, columns = GridCells.Fixed(3), modifier = Modifier.height(200.dp)) {
+            LazyVerticalGrid(state = state,
+                columns = GridCells.Fixed(3),
+                modifier = Modifier.height(200.dp),
+                contentPadding = PaddingValues(horizontal = 5.dp, vertical = 5.dp),  //设置内容上下左右padding
+                verticalArrangement = Arrangement.spacedBy(10.dp), // 设置垂直方向项目之间的间距
+                horizontalArrangement = Arrangement.spacedBy(10.dp) // 设置水平方向项目之间的间距
+            ) {
                 items(list) {
                     Text(text = it, modifier = Modifier.height(60.dp))
                 }
@@ -668,7 +697,10 @@ fun SampleOne(context: Context? = null) {
         UnitCard(title = "Image基本用法") {
             val ivPainter = painterResource(id = R.mipmap.iv_cover_happy)
             Image(
-                modifier = Modifier.size(width = 200.dp, height = 100.dp)
+                modifier = Modifier
+                    .size(width = 200.dp, height = 100.dp)
+                    //剪裁圆角
+                    .clip(RoundedCornerShape(8.dp))
                 //通过Modifier设置Image宽高比 可达到效果：android:adjustViewBounds="true"
                 //.aspectRatio(ivPainter.intrinsicSize.width / ivPainter.intrinsicSize.height)
                 ,

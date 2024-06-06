@@ -28,15 +28,16 @@ class TodoActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     TodoActivityScreen()
+
                 }
             }
         }
     }
 
-   //val sss = MutableLiveData<List<TodoItem>>(listOf())
+   val sss = MutableLiveData<List<TodoItem>>(listOf())
     @Composable
     private fun TodoActivityScreen() {
-        //sss.observeAsState()
+        sss.observeAsState()
         // 补充委托知识点 by 属性委托 P31
         //items可以视为一个状态 LiveData可以直接通过observeAsState转为一个state对象
         //val items: List<TodoItem> by viewModel.todoItems.observeAsState(listOf())

@@ -31,7 +31,8 @@ fun ConstrainLayoutContent1() {
         val (button, text) = createRefs()
         Button(onClick = { /*TODO*/ }, modifier = Modifier.constrainAs(button) {
             top.linkTo(parent.top, margin = 16.dp)
-
+            /*verticalChainWeight
+            bottom.linkTo(parent.bottom,)*/
         }) {
             Text(text = "Button")
         }
