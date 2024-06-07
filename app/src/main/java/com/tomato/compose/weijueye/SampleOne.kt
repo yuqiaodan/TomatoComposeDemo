@@ -108,6 +108,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomato.compose.R
 import com.tomato.compose.bean.UserBean
+import com.tomato.compose.dongnaoxueyuan.unit4effect.SampleEffectActivity
 import com.tomato.compose.log
 import com.tomato.compose.toast
 
@@ -126,6 +127,12 @@ fun SampleOne(context: Context? = null) {
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
+
+        UnitCard(title = "Effect副作用的用法") {
+            Button(onClick = { context?.let { it.startActivity(Intent(it, SampleEffectActivity::class.java)) } }) {
+                Text(text = "跳转->Effect的使用")
+            }
+        }
 
         UnitCard(title = "Navigation导航的用法") {
             Button(onClick = { context?.let { it.startActivity(Intent(it, SampleNavigationActivity::class.java)) } }) {
@@ -856,7 +863,7 @@ private fun StateSample(parentCount: Int, setParent: (Int) -> Unit) {
 
 
 @Composable
-private fun UnitCard(title: String, content: @Composable () -> Unit) {
+fun UnitCard(title: String, content: @Composable () -> Unit) {
     Box(modifier = Modifier.padding(8.dp)) {
         Surface(color = Color.White, modifier = Modifier.fillMaxWidth(), shadowElevation = 2.dp, shape = RoundedCornerShape(10.dp)) {
             Column(modifier = Modifier.padding(8.dp)) {

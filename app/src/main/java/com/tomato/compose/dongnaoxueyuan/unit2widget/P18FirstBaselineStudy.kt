@@ -1,4 +1,4 @@
-package com.tomato.compose.dongnaoxueyuan.unit2
+package com.tomato.compose.dongnaoxueyuan.unit2widget
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.Text

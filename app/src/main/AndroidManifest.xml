@@ -16,6 +16,10 @@
         android:theme="@style/Theme.TomatoComposeDemo"
         tools:targetApi="31">
         <activity
+            android:name=".dongnaoxueyuan.unit4effect.SampleEffectActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TomatoComposeDemo" />
+        <activity
             android:name=".weijueye.SampleNavigationActivity"
             android:exported="false"
             android:theme="@style/Theme.TomatoComposeDemo" />
@@ -43,11 +47,11 @@
             android:exported="true"
             android:theme="@style/Theme.TomatoComposeDemo" />
         <activity
-            android:name=".dongnaoxueyuan.unit2.WidgetActivity"
+            android:name=".dongnaoxueyuan.unit2widget.WidgetActivity"
             android:exported="true"
             android:theme="@style/Theme.TomatoComposeDemo" />
         <activity
-            android:name=".dongnaoxueyuan.unit1.FirstListActivity"
+            android:name=".dongnaoxueyuan.unit1first.FirstListActivity"
             android:exported="true"
             android:theme="@style/Theme.TomatoComposeDemo" />
     </application>

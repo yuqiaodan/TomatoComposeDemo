@@ -1,4 +1,4 @@
-package com.tomato.compose.dongnaoxueyuan.unit2
+package com.tomato.compose.dongnaoxueyuan.unit2widget
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
