@@ -16,7 +16,7 @@
 /***
  * 官方动画教程示例代码：
  * - 教程地址：https://developer.android.com/codelabs/jetpack-compose-animation?hl=zh-cn#0
- * - 教程代码库：https://github.com/android/codelab-android-compose
+ * - 教程代码库：https://github.com/android/codelab-android-compose  AnimationCodelab
  * - b站视频同款代码
  * */
 
@@ -24,6 +24,24 @@
 package com.tomato.compose.dongnaoxueyuan.unit5anim.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -90,10 +108,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -107,16 +125,18 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tomato.compose.R
 import com.tomato.compose.dongnaoxueyuan.unit5anim.ui.Amber600
 import com.tomato.compose.dongnaoxueyuan.unit5anim.ui.AnimationCodelabTheme
 import com.tomato.compose.dongnaoxueyuan.unit5anim.ui.Green
 import com.tomato.compose.dongnaoxueyuan.unit5anim.ui.GreenLight
 import com.tomato.compose.dongnaoxueyuan.unit5anim.ui.PaleDogwood
 import com.tomato.compose.dongnaoxueyuan.unit5anim.ui.Seashell
-import com.tomato.compose.R
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 private enum class TabPage {
     Home, Work
@@ -173,7 +193,14 @@ fun Home() {
 
     // The background color. The value is changed by the current tab.
     // TODO 1: Animate this color change.
-    val backgroundColor = if (tabPage == TabPage.Home) Seashell else GreenLight
+    /**
+     *  动画小节1：简单值动画
+     *  使用 animate*AsState 可以创建不同类型的简单值动画 这里背景是颜色 所以使用animateColorAsState
+     * */
+    //修改为动画
+    val backgroundColor by animateColorAsState(targetValue = if (tabPage == TabPage.Home) Seashell else GreenLight)
+    //原代码（无动画）
+    //val backgroundColor = if (tabPage == TabPage.Home) Seashell else GreenLight
 
     // The coroutine scope for event handlers calling suspend functions.
     val coroutineScope = rememberCoroutineScope()
@@ -197,15 +224,17 @@ fun Home() {
             )
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(
-            top = padding.calculateTopPadding(),
-            start = padding.calculateLeftPadding(LayoutDirection.Ltr),
-            end = padding.calculateEndPadding(LayoutDirection.Ltr)
-        )) {
+        Box(
+            modifier = Modifier.padding(
+                top = padding.calculateTopPadding(),
+                start = padding.calculateLeftPadding(LayoutDirection.Ltr),
+                end = padding.calculateEndPadding(LayoutDirection.Ltr)
+            )
+        ) {
             LazyColumn(
                 contentPadding = WindowInsets(
                     16.dp,
-                     32.dp,
+                    32.dp,
                     16.dp,
                     padding.calculateBottomPadding() + 32.dp
                 ).asPaddingValues(),
@@ -291,13 +320,26 @@ private fun HomeFloatingActionButton(
             )
             // Toggle the visibility of the content with animation.
             // TODO 2-1: Animate this visibility change.
-            if (extended) {
+            /**
+             *  动画小节2-1：可见性动画 控件消失以及显示时自动播放动画
+             *  AnimatedVisibility 是否可见
+             * */
+            AnimatedVisibility(visible = extended) {
                 Text(
                     text = stringResource(R.string.edit),
                     modifier = Modifier
                         .padding(start = 8.dp, top = 3.dp)
                 )
             }
+
+            //原代码（无动画）
+            /*if (extended) {
+                Text(
+                    text = stringResource(R.string.edit),
+                    modifier = Modifier
+                        .padding(start = 8.dp, top = 3.dp)
+                )
+            }*/
         }
     }
 }
@@ -309,8 +351,32 @@ private fun HomeFloatingActionButton(
 private fun EditMessage(shown: Boolean) {
     // TODO 2-2: The message should slide down from the top on appearance and slide up on
     //           disappearance.
+    /**
+     *  动画小节2-2：可见性动画 AnimatedVisibility 可以通过enter和exit设置进入和退出效果
+     * */
     AnimatedVisibility(
-        visible = shown
+        visible = shown,
+        /**
+         * enter设置进入动画
+         * initialOffsetY 可以设置动画的偏移量（）
+         * animationSpec 设置动画持续时间durationMillis 和 插值器easing（变化曲线）
+         * */
+        /***
+         * animationSpec 理解为超级插值器 可以设置动画运行方式 回弹，先快后慢什么什么的
+         * 除了spring（物理仿真动画）还有其他效果可选：
+         * tween: 适用于大多数简单、基于时间的动画需求。
+         * spring: 适用于需要物理仿真效果的动画。
+         * keyframes: 适用于需要精确控制动画各个时间点具体值的动画。
+         * repeatable: 适用于需要重复一定次数的动画。
+         * infiniteRepeatable: 适用于需要无限次重复的动画。*/
+        enter = slideInVertically(
+            animationSpec = tween(durationMillis = 150, easing = LinearOutSlowInEasing),
+            initialOffsetY = { fullHeight -> -fullHeight }
+        ),
+        exit = slideOutVertically(
+            //FastOutLinearInEasing 先慢后快
+            animationSpec = tween(durationMillis = 150, easing = FastOutLinearInEasing)
+        )
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -379,10 +445,16 @@ private fun TopicRow(topic: String, expanded: Boolean, onClick: () -> Unit) {
         onClick = onClick
     ) {
         // TODO 3: Animate the size change of the content.
+        /**
+         * 动画小节3 内容大小动画animateContentSize 组件宽高变化后自动播放动画
+         * Modifier.animateContentSize()
+         * */
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                //添加内容大小变化动画
+                .animateContentSize()
         ) {
             Row {
                 Icon(
@@ -395,6 +467,7 @@ private fun TopicRow(topic: String, expanded: Boolean, onClick: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -439,7 +512,7 @@ private fun HomeTabBar(
             indicator = { tabPositions ->
                 HomeTabIndicator(tabPositions, tabPage)
             }
-        ){
+        ) {
             HomeTab(
                 icon = Icons.Default.Home,
                 title = stringResource(R.string.home),
@@ -459,6 +532,9 @@ private fun HomeTabBar(
  *
  * @param tabPositions The list of [TabPosition]s from a [TabRow].
  * @param tabPage The [TabPage] that is currently selected.
+ *
+ * tabPositions 包含了TabRow中所有选项卡的位置信息
+ * tabPositions[0]：读取第一个选项卡位置信息
  */
 @Composable
 private fun HomeTabIndicator(
@@ -466,9 +542,75 @@ private fun HomeTabIndicator(
     tabPage: TabPage
 ) {
     // TODO 4: Animate these value changes.
-    val indicatorLeft = tabPositions[tabPage.ordinal].left
-    val indicatorRight = tabPositions[tabPage.ordinal].right
-    val color = if (tabPage == TabPage.Home) PaleDogwood else Green
+    /**
+     * 动画小节4 多值动画 对组件的颜色，位置，大小等属性同时进行改变并播放动画
+     * = 使用updateTransition 创建过度动画 当targetState发生改变时 朝着指定目标值运行所有子动画 label是标签 注释
+     * - 这里targetState就是tabPage
+     * - 可以使用transition对象动态添加子动画：transition.animate*
+     * - 这里的子动画包含3个需要修改的属性：就是指示器的左边位置，右边位置，颜色
+     * - transition
+     * */
+    val transition = updateTransition(targetState = tabPage, label = "过渡动画")
+
+    /**
+     * 指示器平移动画
+     * */
+    /*//指示器左位置
+    val indicatorLeft by transition.animateDp(label = "左边位置") { tabPage->
+        tabPositions[tabPage.ordinal].left
+    }
+    //指示器右位置
+    val indicatorRight by transition.animateDp(label = "右边位置") { tabPage->
+        tabPositions[tabPage.ordinal].right
+    }
+    //指示器颜色
+    val color by transition.animateColor(label = "颜色") {tabPage->
+        if (tabPage == TabPage.Home) PaleDogwood else Green
+    }*/
+    /**
+     * 指示器平移动画+弹性效果
+     * 思路：向右时移动时右边距变化更快，向左移动时左边距变化更快 就可以达到效果
+     * */
+    //指示器左位置
+    val indicatorLeft by transition.animateDp(
+        transitionSpec = {
+            if (TabPage.Home isTransitioningTo TabPage.Work) {
+                //左边缘 向右移动时 变化慢点
+                spring(stiffness = Spring.StiffnessVeryLow)
+            } else {
+                //左边缘 向左移动时 变化快点
+                spring(stiffness = Spring.StiffnessMedium)
+            }
+        },
+        label = "左边位置"
+    ) { tabPage ->
+        tabPositions[tabPage.ordinal].left
+    }
+    //指示器右位置
+    val indicatorRight by transition.animateDp(transitionSpec = {
+        if (TabPage.Home isTransitioningTo TabPage.Work) {
+            //右边缘 向右移动时 变化快点
+            spring(stiffness = Spring.StiffnessMedium)
+        } else {
+            //右边缘 向左移动时 变化慢点
+            spring(stiffness = Spring.StiffnessVeryLow)
+        }
+    }, label = "右边位置") { tabPage ->
+        tabPositions[tabPage.ordinal].right
+    }
+    //指示器颜色
+    val color by transition.animateColor(label = "颜色") { tabPage ->
+        if (tabPage == TabPage.Home) PaleDogwood else Green
+    }
+
+    //原代码（无动画）
+    //指示器左位置
+    //val indicatorLeft = tabPositions[tabPage.ordinal].left
+    //指示器右位置
+    //val indicatorRight = tabPositions[tabPage.ordinal].right
+    //指示器颜色
+    //val color = if (tabPage == TabPage.Home) PaleDogwood else Green
+
     Box(
         Modifier
             .fillMaxSize()
@@ -554,7 +696,24 @@ private fun WeatherRow(
 @Composable
 private fun LoadingRow() {
     // TODO 5: Animate this value between 0f and 1f, then back to 0f repeatedly.
-    val alpha = 1f
+    /**
+     * 动画小节5 rememberInfiniteTransition 重复动画 让alpha的值在0f-1f之间不断重复
+     * */
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    //alpha变化 ： 0f->1f->0f->1f 总时长1秒
+    //animateFloat返回的是State<Float>
+    val alpha by infiniteTransition.animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = infiniteRepeatable(
+        //keyframes创建KeyframesSpec
+        keyframes {
+            //持续时间 1000毫秒
+            durationMillis = 1000
+            //指定关键帧 500毫秒时 value = 1f
+            1f at 500
+        }
+    ), label = "无限重复的透明度动画")
+
+    //原代码（无动画）
+    //val alpha = 1f
     Row(
         modifier = Modifier
             .heightIn(min = 64.dp)
@@ -585,6 +744,7 @@ private fun LoadingRow() {
  */
 @Composable
 private fun TaskRow(task: String, onRemove: () -> Unit) {
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -613,12 +773,74 @@ private fun TaskRow(task: String, onRemove: () -> Unit) {
  * The modified element can be horizontally swiped away.
  *
  * @param onDismissed Called when the element is swiped to the edge of the screen.
+ *
+ * 动画小节6 通过手势动画实现滑动删除task效果
  */
+
+
 private fun Modifier.swipeToDismiss(
     onDismissed: () -> Unit
 ): Modifier = composed {
-    // TODO 6-1: Create an Animatable instance for the offset of the swiped element.
+    /**
+     * TODO 6-1: Create an Animatable instance for the offset of the swiped element.
+     * 创建一个修饰符，用于处理修改元素区域内的光标输入
+     * 调用 PointerInputScope.awaitPointerEventScope可以安装等待PointerInputScope的光标输入处理程序
+     * */
+    //使用offsetX
+    val offsetX = remember { Animatable(0f) }
     pointerInput(Unit) {
+
+        //样条函数衰减器 物理角度来讲：投掷item从初始速度开始 越来越慢
+        val decay = splineBasedDecay<Float>(this)
+
+        //需要在协程的作用域中
+        coroutineScope {
+            while (true) {
+                //等待触摸按下事件
+                //awaitPointerEventScope:挂起并安装指针输入块 该块等待输入时间并立即响应它们
+                //awaitFirstDown：读取事件 直到收到第一个down
+                val pointerId = awaitPointerEventScope {
+                    awaitFirstDown().id
+                }
+                //记录滑动的时间和距离
+                val velocityTracker = VelocityTracker()
+
+                awaitPointerEventScope {
+                    //监听水平滑动 change为水滑动距离的变化
+                    horizontalDrag(pointerId) { change ->
+                        val horizontalDragOffset = offsetX.value + change.positionChange().x
+                        launch {
+                            offsetX.snapTo(horizontalDragOffset)
+                        }
+                        velocityTracker.addPosition(change.uptimeMillis, change.position)
+
+                        //消费掉此手势事件 不再向上传递 解决横竖滑动冲突
+                        change.consumePositionChange()
+                    }
+                }
+                //计算滑动的速度 拖动完成 这就是我们投掷item的速度
+                val velocity = velocityTracker.calculateVelocity().x
+                //计算投掷的最终位置来决定是将元素归位还是滑动移除 最终位置=初始速度衰减为0后的距离
+                val targetOffsetX = decay.calculateTargetValue(offsetX.value,velocity)
+                //设置一下偏移量动画 避免滑出Task列表横向边界
+                offsetX.updateBounds(
+                    lowerBound = -size.width.toFloat(),
+                    upperBound = size.width.toFloat()
+                )
+                if(targetOffsetX.absoluteValue<=size.width){
+                    //滑动到原位置
+                    offsetX.animateTo(targetValue = 0f, initialVelocity = velocity)
+                }else{
+                    //滑动出去
+                    offsetX.animateDecay(velocity,decay)
+                    onDismissed()
+                }
+            }
+        }
+    }.offset { IntOffset(offsetX.value.roundToInt(), 0) }
+
+    // TODO 6-1: Create an Animatable instance for the offset of the swiped element.
+    /*pointerInput(Unit) {
         // Used to calculate a settling position of a fling animation.
         val decay = splineBasedDecay<Float>(this)
         // Wrap in a coroutine scope to use suspend functions for touch events and animation.
@@ -651,11 +873,12 @@ private fun Modifier.swipeToDismiss(
                 }
             }
         }
-    }
-        .offset {
+    }.offset {
             // TODO 6-7: Use the animating offset value here.
             IntOffset(0, 0)
-        }
+        }*/
+
+
 }
 
 @Preview
