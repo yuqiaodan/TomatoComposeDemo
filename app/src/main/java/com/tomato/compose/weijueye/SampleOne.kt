@@ -109,6 +109,7 @@ import androidx.compose.ui.unit.sp
 import com.tomato.compose.R
 import com.tomato.compose.bean.UserBean
 import com.tomato.compose.dongnaoxueyuan.unit4effect.SampleEffectActivity
+import com.tomato.compose.dongnaoxueyuan.unit5anim.SampleAnimActivity
 import com.tomato.compose.log
 import com.tomato.compose.toast
 
@@ -128,7 +129,15 @@ fun SampleOne(context: Context? = null) {
             .verticalScroll(scrollState)
     ) {
 
-        UnitCard(title = "Effect副作用的用法") {
+
+        UnitCard(title = "动画综合课程(动脑学院)") {
+            Button(onClick = { context?.let { it.startActivity(Intent(it, SampleAnimActivity::class.java)) } }) {
+                Text(text = "跳转->动画综合界面")
+            }
+        }
+
+
+        UnitCard(title = "Effect副作用的用法(动脑学院)") {
             Button(onClick = { context?.let { it.startActivity(Intent(it, SampleEffectActivity::class.java)) } }) {
                 Text(text = "跳转->Effect的使用")
             }
