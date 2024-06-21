@@ -21,6 +21,7 @@ class TodoActivity : ComponentActivity() {
 
     private val viewModel by viewModels<TodoViewModel>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -28,7 +29,6 @@ class TodoActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     TodoActivityScreen()
-
                 }
             }
         }
