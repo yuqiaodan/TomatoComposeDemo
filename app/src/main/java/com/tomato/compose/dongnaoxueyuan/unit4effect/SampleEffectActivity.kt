@@ -6,15 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -72,6 +76,7 @@ import kotlinx.coroutines.withContext
 class SampleEffectActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             PageContent()
         }
@@ -92,7 +97,35 @@ class SampleEffectActivity : ComponentActivity() {
         /**示例6：使用produceState **/
         //ProduceStateSample()
         /**示例7：使用derivedStateOf **/
-        DerivedStateOfSample()
+        //DerivedStateOfSample()
+
+        TextKeyboard()
+    }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    @Composable
+    fun TextKeyboard() {
+        Box(
+            Modifier.imePadding()
+                .safeDrawingPadding()
+                .fillMaxSize()
+        ) {
+            Box(
+                Modifier.fillMaxSize()
+            ) {
+                val (inputValue, setInputValue) = remember {
+                    mutableStateOf("")
+                }
+                Column(Modifier.align(Alignment.BottomCenter)) {
+                    TextField(value = inputValue, onValueChange = setInputValue)
+                    Button(onClick = { }) {
+                        Text(text = "确认")
+                    }
+                }
+            }
+        }
+
+
     }
 
     /** ========== 示例7==========*
@@ -109,7 +142,7 @@ class SampleEffectActivity : ComponentActivity() {
         //todoTask或highKeyWord改变后 重新生成highTask
         val highTask = remember(todoTask.size, highKeyWord) {
             derivedStateOf {
-                todoTask.filter {task->
+                todoTask.filter { task ->
                     var isHigh = false
                     highKeyWord.forEach { key ->
                         if (task.contains(key)) {
