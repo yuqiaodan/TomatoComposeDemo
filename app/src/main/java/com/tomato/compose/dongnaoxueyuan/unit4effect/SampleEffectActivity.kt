@@ -105,6 +105,7 @@ class SampleEffectActivity : ComponentActivity() {
     @OptIn(ExperimentalLayoutApi::class)
     @Composable
     fun TextKeyboard() {
+
         Box(
             Modifier.imePadding()
                 .safeDrawingPadding()
@@ -591,6 +592,7 @@ class SampleEffectActivity : ComponentActivity() {
          * 首次重组和isPlayingCountUp改变 都会执行 启动一个协程 执行block
          * 连续触发执行 会先cancel掉上一个协程再执行block
          * compose销毁后 自动cancel
+         * 可以用于关注某个变量的值的改变
          * **/
         LaunchedEffect(key1 = isPlayingCountUp) {
             if (isPlayingCountUp) {
