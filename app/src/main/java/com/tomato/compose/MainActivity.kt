@@ -33,7 +33,6 @@ class MainActivity : ComponentActivity() {
             InputDialog(isShowInputDialog,{isShowInputDialog=false})
         }
 
-
         onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
                 log("MainActivity handleOnBackPressed")
@@ -68,7 +67,7 @@ fun InputDialog(isShow:Boolean,onDismissRequest:()->Unit) {
             ){
                 EditFolderNamePopup(modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .imePadding())
+                    .imePadding(), onCancel = onDismissRequest)
             }
         }
 

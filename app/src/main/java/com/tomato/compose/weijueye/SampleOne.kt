@@ -1026,7 +1026,7 @@ fun EditFolderNamePopup( modifier: Modifier = Modifier, onCancel: () -> Unit = {
                     .weight(1f)
                     .height(44.dp)
                 Button(onClick = {
-
+                    onCancel()
                 }) {
                     androidx.compose.material.Text(text = "关闭")
                 }
