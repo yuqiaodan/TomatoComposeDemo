@@ -22,15 +22,11 @@ import com.tomato.compose.weijueye.EditFolderNamePopup
 import com.tomato.compose.weijueye.SampleOne
 
 class MainActivity : ComponentActivity() {
-    var isShowInputDialog by  mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SampleOne(this){
-                isShowInputDialog =true
-            }
-            InputDialog(isShowInputDialog,{isShowInputDialog=false})
+            SampleOne(this)
         }
 
         onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
@@ -43,36 +39,7 @@ class MainActivity : ComponentActivity() {
             }})
     }
 
-    /*override fun onBackPressed() {
-        super.onBackPressed()
-        log("MainActivity onBackPressed")
-    }*/
-
 
 
 
 }
-
-@Composable
-fun InputDialog(isShow:Boolean,onDismissRequest:()->Unit) {
-    if(isShow){
-        Dialog(onDismissRequest = onDismissRequest,
-            //usePlatformDefaultWidth = false 解除两边的宽度。
-            //decorFitsSystemWindows= false 可以禁止强行装饰系统窗口，从而自动适配键盘，但黑色背景就没有了 最好是有输入框的时候进行设置
-            DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
-        ) {
-            Box (modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(0.5f))
-            ){
-                EditFolderNamePopup(modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .imePadding(), onCancel = onDismissRequest)
-            }
-        }
-
-    }
-}
-
-
-

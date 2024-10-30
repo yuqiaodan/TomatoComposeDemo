@@ -134,19 +134,30 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun SampleOne(context: Context? = null,onShowInputDialog:()->Unit) {
+fun SampleOne(context: Context? = null) {
     val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
 
+       /* InputDialog(isShow = isShowInputDialog) {
+            isShowInputDialog=false
+        }*/
+
         UnitCard(title = "显示Dialog 输入框键盘适配") {
 
+            var isShowInputDialog by remember {
+                mutableStateOf(true)
+            }
 
-
-            Button(onClick = { onShowInputDialog() }) {
+            Button(onClick = { isShowInputDialog=true }) {
                 Text(text = "显示输入框")
+            }
+
+            InputDialog(isShow =isShowInputDialog ) {
+                isShowInputDialog=false
             }
         }
 
@@ -982,6 +993,33 @@ fun FullImeScreenPopup(onDismissRequest: () -> Unit, content: @Composable BoxSco
         onDismissRequest()
     }
 }
+
+
+
+@Composable
+fun InputDialog(isShow:Boolean,onDismissRequest:()->Unit) {
+    if(isShow){
+        Dialog(onDismissRequest = onDismissRequest,
+            //usePlatformDefaultWidth = false 解除两边的宽度。
+            //decorFitsSystemWindows= false 可以禁止强行装饰系统窗口，从而可以通过imePadding自动适配键盘，但黑色背景就没有了 最好是有输入框的时候进行设置
+            //imePadding  .safeDrawingPadding() 在 Dialog中 decorFitsSystemWindows= true 不生效
+            //.imePadding() .safeDrawingPadding() 二选一设置都可以 safeDrawingPadding除了适配键盘还适配了底部导航栏
+            DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+        ) {
+            Box (modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(0.5f))
+                .safeDrawingPadding()
+            ){
+                EditFolderNamePopup(modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    , onCancel = onDismissRequest)
+            }
+        }
+
+    }
+}
+
 
 
 
