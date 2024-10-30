@@ -3,6 +3,7 @@ package com.tomato.compose.weijueye
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -25,14 +26,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -64,9 +69,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
@@ -77,10 +82,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,12 +114,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.tomato.compose.R
 import com.tomato.compose.bean.UserBean
 import com.tomato.compose.dongnaoxueyuan.unit4effect.SampleEffectActivity
 import com.tomato.compose.dongnaoxueyuan.unit5anim.SampleAnimActivity
 import com.tomato.compose.log
 import com.tomato.compose.toast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * Created by Tomato on 2024/5/31.
@@ -120,15 +133,36 @@ import com.tomato.compose.toast
  * 博客地址：https://docs.bughub.icu/compose/
  */
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
-@Preview(showSystemUi = true)
 @Composable
-fun SampleOne(context: Context? = null) {
+fun SampleOne(context: Context? = null,onShowInputDialog:()->Unit) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
 
+        UnitCard(title = "显示Dialog 输入框键盘适配") {
+
+
+
+            Button(onClick = { onShowInputDialog() }) {
+                Text(text = "显示输入框")
+            }
+        }
+
+
+
+        UnitCard(title = "isActive测试") {
+            var isInitActiveCompose by remember {
+                mutableStateOf(false)
+            }
+            Button(onClick = { isInitActiveCompose = !isInitActiveCompose }) {
+                Text(text = "跳转->动画综合界面")
+            }
+            if(isInitActiveCompose){
+                ActiveTest()
+            }
+        }
 
         UnitCard(title = "动画综合课程(动脑学院)") {
             Button(onClick = { context?.let { it.startActivity(Intent(it, SampleAnimActivity::class.java)) } }) {
@@ -883,4 +917,130 @@ fun UnitCard(title: String, content: @Composable () -> Unit) {
         }
     }
 }
+
+
+@Composable
+fun ActiveTest() {
+    var number by remember {
+        mutableStateOf(0)
+    }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        log("LaunchedEffect isActive1 ---> $isActive ")
+        while (isActive) {
+            delay(200L)
+            number++
+            log("number-> $number")
+
+        }
+        /*delay(200L)
+        scope.launch {
+            log("scope isActive ---> $isActive ")
+            while (isActive) {
+                delay(200L)
+                number++
+                log("number-> $number")
+
+            }
+        }*/
+        log("LaunchedEffect isActive2 ---> $isActive ")
+    }
+    DisposableEffect(Unit)  {
+        log("DisposableEffect init")
+        onDispose {
+            log("DisposableEffect onDispose ")
+        }
+    }
+    Text(text = "count: $number")
+
+
+}
+
+
+
+
+
+
+
+@Composable
+fun FullImeScreenPopup(onDismissRequest: () -> Unit, content: @Composable BoxScope.() -> Unit) {
+    //imePadding在Dialog中不生效 所以自建一个dialog处理一下返回事件 点击返回消失
+    //.imePadding()
+    //.imePadding()   .safeDrawingPadding() 二选一设置都可以 safeDrawingPadding除了适配键盘还适配了底部导航栏
+    Box(
+        Modifier
+            .imePadding()
+            .safeDrawingPadding()
+            .background(Color.Black.copy(alpha = 0.4f))
+            .fillMaxSize()
+            .clickable { }
+    ) {
+        content()
+    }
+    BackHandler {
+        onDismissRequest()
+    }
+}
+
+
+
+@Composable
+fun EditFolderNamePopup( modifier: Modifier = Modifier, onCancel: () -> Unit = {}, onConfirm: (folderName: String) -> Unit = {}) {
+    val (inputValue, setInputValue) = remember {
+        mutableStateOf( "")
+    }
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color.White, shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                )
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            androidx.compose.material3.Text(
+                text ="123123", fontSize = 18.sp, color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = inputValue, onValueChange = setInputValue, label = {
+                    androidx.compose.material3.Text(text = "123123", color = Color.Black)
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black,
+                    focusedContainerColor = Color(0xFFF3F3F3),
+                    unfocusedContainerColor = Color(0xFFF3F3F3),
+                    focusedLabelColor = Color.Transparent
+                )
+            )
+            Row(
+                modifier = Modifier.padding(top = 30.dp)
+            ) {
+                val btnModifier = Modifier
+                    .weight(1f)
+                    .height(44.dp)
+                Button(onClick = {
+
+                }) {
+                    androidx.compose.material.Text(text = "关闭")
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Button(onClick = {
+
+                }) {
+                    androidx.compose.material.Text(text = "关闭")
+                }
+            }
+        }
+    }
+}
+
+
+
 

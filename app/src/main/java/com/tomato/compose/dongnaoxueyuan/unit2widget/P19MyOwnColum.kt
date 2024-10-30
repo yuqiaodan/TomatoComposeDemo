@@ -28,6 +28,7 @@ fun MyOwnColum(
 
         var yPosition =0
 
+
         //布局大小
         layout(constraints.maxWidth, constraints.maxHeight) {
             //排列元素 和自定义ViewGroup很像
@@ -50,6 +51,5 @@ fun MyOwnColumnSimple() {
         Text(text = "3")
         Text(text = "4")
     }
-
 
 }

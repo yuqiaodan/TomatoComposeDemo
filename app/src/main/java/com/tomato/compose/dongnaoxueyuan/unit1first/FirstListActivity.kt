@@ -47,6 +47,7 @@ import com.tomato.compose.ui.theme.TomatoComposeDemoTheme
  * */
 class FirstListActivity : ComponentActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

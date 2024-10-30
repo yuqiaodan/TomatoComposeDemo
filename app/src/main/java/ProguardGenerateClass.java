@@ -17,9 +17,9 @@ import java.util.Random;
 public class ProguardGenerateClass {
 
     //字典样本
-    private static List<String> SOURCE = Arrays.asList("N", "M", "W");
+    private static List<String> SOURCE = Arrays.asList("a", "o", "e");
     //字典行数
-    private static int LENGTH = 20000;
+    private static int LENGTH = 30000;
     //输出路径
     private static final String ROOT_PATH = System.getProperty("user.dir") + "/app/";
     //输出名称
