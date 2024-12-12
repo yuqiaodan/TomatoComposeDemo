@@ -999,11 +999,14 @@ fun FullImeScreenPopup(onDismissRequest: () -> Unit, content: @Composable BoxSco
 @Composable
 fun InputDialog(isShow:Boolean,onDismissRequest:()->Unit) {
     if(isShow){
+        /**
+         * usePlatformDefaultWidth = false 解除两边的宽度。
+         * decorFitsSystemWindows= false 可以禁止强行装饰系统窗口，从而可以通过imePadding自动适配键盘，但黑色背景就没有了 最好是有输入框的时候进行设置
+         * imePadding  .safeDrawingPadding() 在 Dialog中 decorFitsSystemWindows= true 不生效
+         * .imePadding() .safeDrawingPadding() 二选一设置都可以 safeDrawingPadding除了适配键盘还适配了底部导航栏
+         *
+         * */
         Dialog(onDismissRequest = onDismissRequest,
-            //usePlatformDefaultWidth = false 解除两边的宽度。
-            //decorFitsSystemWindows= false 可以禁止强行装饰系统窗口，从而可以通过imePadding自动适配键盘，但黑色背景就没有了 最好是有输入框的时候进行设置
-            //imePadding  .safeDrawingPadding() 在 Dialog中 decorFitsSystemWindows= true 不生效
-            //.imePadding() .safeDrawingPadding() 二选一设置都可以 safeDrawingPadding除了适配键盘还适配了底部导航栏
             DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
         ) {
             Box (modifier = Modifier
