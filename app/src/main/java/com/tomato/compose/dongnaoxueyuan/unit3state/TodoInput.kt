@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -290,6 +291,8 @@ fun TodoEditText(
     onImeAction: () -> Unit
 ) {
     val kc = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     TextField(
         value = text,
         onValueChange = onTextChange,
@@ -299,7 +302,10 @@ fun TodoEditText(
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {
             onImeAction()
+            //自动隐藏键盘
             kc?.hide()
+            //自动清除焦点
+            focusManager.clearFocus()
         }),
         modifier = modifier.background(Color.White)
     )

@@ -132,6 +132,7 @@ class SampleEffectActivity : ComponentActivity() {
     /** ========== 示例7==========*
      * 如果某个状态是从另一个状态计算或衍生获得 可以使用derivedStateOf
      * 当任意一个条件状态更新时，结果状态都会重新计算
+     * 可以理解成状态分割 状态A 和 状态B 状态A 从1变化到100  状态B只需要关注A是否大于50 此时就可以通过derivedStateOf衍生出状态B 避免触发多余的重组
      *
      * eg:例如 我这里有一个todo列表 item列表包含高优先级关键词是置顶
      */
